@@ -54,6 +54,8 @@ In build order. Each slice depends only on the ones above it.
 | 5 | Double-booking guard | Front desk is warned before checking a walk-in into a bed that is held | | `feat/hold-guard` | Not started |
 | 6 | Change log | Caseworker sees a shelter's recent check-ins, check-outs and holds, to judge whether a count is current | | `feat/change-log` | Not started |
 | 7 | No-bed guidance | When nothing fits, caseworker sees each suitable shelter's phone number and "beds usually open around noon and at 9 PM" | | `feat/no-bed-guidance` | Not started |
+| 8 | Shelter settings | Admin adds, edits and closes shelters (name, address, phone, capacity, eligibility rules) and sets the curfew | | `feat/shelter-settings` | Not started |
+| 9 | Sign in | Shared logins per shelter, for caseworkers and for Admin. Each shelter changes only its own beds. Admin changes shelter passwords | | `feat/sign-in` | Not started |
 
 ## Decisions so far
 
@@ -61,12 +63,19 @@ In build order. Each slice depends only on the ones above it.
 - **Checkboxes, not AI, for eligibility.** Eligibility is four or five facts, checkboxes are faster during a call, and they keep a person's story out of any outside service.
 - **Timestamps and a change log, not confirmations.** Asking the front desk to confirm counts adds the kind of work that killed the Google Sheet.
 - **Lean toward caution.** A forgotten check-in sends someone to a bed that isn't there, which is worse than a forgotten check-out. Check-in is the biggest button on the front desk screen.
+- **Count beds per shelter, not individual beds.** See [ADR 0001](adr/0001-count-beds-per-shelter.md). The family shelter counts by family: one hold or check in covers one family.
+- **Shared logins.** One per shelter, one for caseworkers, one for Admin. See [ADR 0002](adr/0002-shared-logins.md). The hackathon build uses a role picker instead.
+- **Holds** last one hour, and the caseworker or front desk can extend them by 30 minutes any number of times. A walk-in who would take a held bed gets a warning, not a block.
+- **Time zone:** US Eastern (America/New_York).
+- **Stack:** Next.js with TypeScript, Supabase, deployed on Vercel. Screens update live.
+- **Keep little data.** The change log shows the last 24 hours, and anything older than 30 days is deleted. Sample data is invented, and real shelter details are never committed to the repo.
+- **Words:** use the terms in [GLOSSARY.md](../GLOSSARY.md).
 
-## Open questions for planning
+## Answered planning questions
 
-- How does the front desk recognize the person a bed is held for, without storing their name? (For example, a short code the caseworker gives them.)
-- What happens when a hold expires while the person is still on their way?
-- How do caseworkers and front desk staff sign in, and does each shelter only see its own beds?
+- **How does the front desk recognize the person a hold is for?** By a three-character hold code that the caseworker gives the person. It identifies the hold, not the person.
+- **What happens when a hold expires while the person is on the way?** The bed becomes free again. The expired hold stays visible to the front desk for 3 hours, so a late arrival can still be recognized if a bed is free. Extend the hold before it runs out to protect the bed.
+- **How do people sign in?** With shared logins (slice 9). Each shelter sees and changes only its own beds, and caseworkers see every shelter.
 
 ## Not building
 
