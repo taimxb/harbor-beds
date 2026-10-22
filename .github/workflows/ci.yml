@@ -8,13 +8,19 @@ on: # on action...
 jobs: # perform this work.
   check:
     runs-on: ubuntu-latest
+    # Public values, stored as repository variables. The secret key never goes here.
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
-        with: 
+        with:
           node-version: 22
           cache: npm
+      - run: test ! -f pnpm-lock.yaml && test ! -f yarn.lock # npm only
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
+      - run: npm test
       - run: npm run build

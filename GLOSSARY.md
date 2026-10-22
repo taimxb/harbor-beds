@@ -48,6 +48,10 @@ _Avoid_: Open bed, available bed, vacant bed
 The single evening time, the same for every shelter, by which residents must return. Beds of residents who have not returned are checked out after it.
 _Avoid_: Lockout, cutoff
 
+**Network settings**:
+Settings that apply to every shelter at once. Today, only the curfew.
+_Avoid_: Global settings, config
+
 **Eligibility rules**:
 A shelter's four settings: women only, accepts children, accepts pets, requires sobriety.
 _Avoid_: Criteria, restrictions, filters
