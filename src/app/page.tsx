@@ -10,13 +10,13 @@ export default function Home() {
       <h1 className="mb-1 text-2xl font-bold">Harbor Beds</h1>
       <p className="mb-4 text-zinc-500">Who are you?</p>
       <Suspense fallback={<p className="text-zinc-500">Loading shelters…</p>}>
-        <Roles />
+        <LiveRolePicker />
       </Suspense>
     </main>
   );
 }
 
-async function Roles() {
+async function LiveRolePicker() {
   await connection();
   return <RolePicker shelters={await listShelters()} />;
 }
