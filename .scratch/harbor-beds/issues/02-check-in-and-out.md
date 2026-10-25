@@ -6,11 +6,11 @@
 
 **Status:** ready-for-agent
 
-- [ ] The role picker offers Caseworker, one front desk per shelter that is not closed, and Admin. The Admin option can lead to an empty placeholder until ticket 10
-- [ ] The front desk screen shows only its own shelter
-- [ ] Check in is the biggest button on the screen. One tap checks in, which increases occupied beds by one
-- [ ] Check out decreases occupied beds by one, and occupied beds never go below 0
-- [ ] Each check in and check out is recorded as a front desk action with a time and the shelter, attributed to "[Shelter] front desk"
-- [ ] Last updated is the time of the shelter's most recent front desk action
-- [ ] The caseworker board and the front desk screen update live, with a 30-second fallback refresh
-- [ ] The front desk screen is usable on a phone as well as a shelter computer
+- [x] The role picker offers Caseworker, one front desk per shelter that is not closed, and Admin. The Admin option can lead to an empty placeholder until ticket 10
+- [x] The front desk screen shows only its own shelter
+- [x] Check in is the biggest button on the screen. One tap checks in, which increases occupied beds by one
+- [x] Check out decreases occupied beds by one, and occupied beds never go below 0
+- [x] Each check in and check out is recorded as a front desk action with a time and the shelter, attributed to "[Shelter] front desk"
+- [x] Last updated is the time of the shelter's most recent front desk action
+- [x] The caseworker board and the front desk screen update live, with a 30-second fallback refresh
+- [x] The front desk screen is usable on a phone as well as a shelter computer

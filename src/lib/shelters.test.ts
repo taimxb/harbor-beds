@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { freeBeds, lastUpdatedStatus } from "./shelters";
+import { freeBeds, frontDeskName, lastUpdatedStatus } from "./shelters";
 
 describe("freeBeds", () => {
   it("is capacity minus occupied beds minus active holds", () => {
@@ -38,5 +38,11 @@ describe("lastUpdatedStatus", () => {
     expect(lastUpdatedStatus(new Date(now.getTime() - 30_000), now).text).toBe(
       "just now",
     );
+  });
+});
+
+describe("frontDeskName", () => {
+  it("attributes front desk actions to the shelter's front desk, not a person", () => {
+    expect(frontDeskName({ name: "Northside" })).toBe("Northside front desk");
   });
 });

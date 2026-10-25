@@ -1,28 +1,22 @@
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { ShelterBoard } from "@/components/shelter-board";
+import { RolePicker } from "@/components/role-picker";
 import { listShelters } from "@/lib/shelter-repository";
-import { formatClockTime } from "@/lib/shelters";
 
+// Stands in for sign in until ticket 11.
 export default function Home() {
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
-      <h1 className="mb-1 text-2xl font-bold">Shelter board</h1>
+    <main className="mx-auto w-full max-w-md flex-1 px-4 py-6">
+      <h1 className="mb-1 text-2xl font-bold">Harbor Beds</h1>
+      <p className="mb-4 text-zinc-500">Who are you?</p>
       <Suspense fallback={<p className="text-zinc-500">Loading shelters…</p>}>
-        <LiveShelterBoard />
+        <Roles />
       </Suspense>
     </main>
   );
 }
 
-async function LiveShelterBoard() {
+async function Roles() {
   await connection();
-  const shelters = await listShelters();
-  const now = new Date();
-  return (
-    <>
-      <p className="mb-4 text-sm text-zinc-500">As of {formatClockTime(now)}</p>
-      <ShelterBoard shelters={shelters} now={now} />
-    </>
-  );
+  return <RolePicker shelters={await listShelters()} />;
 }
