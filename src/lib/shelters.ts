@@ -25,6 +25,11 @@ export function freeBeds({
   return Math.max(0, capacity - occupied - activeHolds);
 }
 
+export function freeBedsAt(shelter: Shelter): number {
+  // Holds arrive in ticket 05.
+  return freeBeds({ ...shelter, activeHolds: 0 });
+}
+
 // Last updated turns amber after this long with no front desk action.
 const STALE_AFTER_MINUTES = 3 * 60;
 
