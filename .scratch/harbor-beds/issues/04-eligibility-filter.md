@@ -6,10 +6,10 @@
 
 **Status:** ready-for-agent
 
-- [ ] The four checkboxes are worded: "Is a woman", "Has children with them", "Has a pet", "Can stay sober"
-- [ ] With nothing ticked, only shelters that would take anyone are shown: not women only, not requiring sobriety. Shelters that don't accept children or pets are still shown, because nobody ticked those boxes
-- [ ] "Is a woman" adds women-only shelters, "Can stay sober" adds sobriety-required shelters, "Has children with them" shows only shelters that accept children, and "Has a pet" shows only shelters that accept pets
-- [ ] Eligible shelters with free beds are listed first, most free beds first
-- [ ] Eligible shelters with no free beds are greyed out below, still showing phone number and Last updated
-- [ ] Ineligible shelters are not shown
-- [ ] Nothing the caseworker ticks is saved
+- [x] The four checkboxes are worded: "Is a woman", "Has children with them", "Has a pet", "Can stay sober"
+- [x] With nothing ticked, only shelters that would take anyone are shown: not women only, not requiring sobriety. Shelters that don't accept children or pets are still shown, because nobody ticked those boxes
+- [x] "Is a woman" adds women-only shelters, "Can stay sober" adds sobriety-required shelters, "Has children with them" shows only shelters that accept children, and "Has a pet" shows only shelters that accept pets
+- [x] Eligible shelters with free beds are listed first, most free beds first
+- [x] Eligible shelters with no free beds are greyed out below, still showing phone number and Last updated
+- [x] Ineligible shelters are not shown
+- [x] Nothing the caseworker ticks is saved

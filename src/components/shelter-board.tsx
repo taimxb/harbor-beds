@@ -1,4 +1,15 @@
-import { freeBeds, lastUpdatedStatus, type Shelter } from "@/lib/shelters";
+"use client";
+
+import { useState } from "react";
+import { eligibleShelters, type PersonFacts } from "@/lib/eligibility";
+import { freeBedsAt, lastUpdatedStatus, type Shelter } from "@/lib/shelters";
+
+const personQuestions: { fact: keyof PersonFacts; label: string }[] = [
+  { fact: "isWoman", label: "Is a woman" },
+  { fact: "hasChildren", label: "Has children with them" },
+  { fact: "hasPet", label: "Has a pet" },
+  { fact: "canStaySober", label: "Can stay sober" },
+];
 
 export function ShelterBoard({
   shelters,
@@ -7,23 +18,84 @@ export function ShelterBoard({
   shelters: Shelter[];
   now: Date;
 }) {
+  // Kept in memory only: what is ticked about a person is never saved.
+  const [person, setPerson] = useState<PersonFacts>({
+    isWoman: false,
+    hasChildren: false,
+    hasPet: false,
+    canStaySober: false,
+  });
+  const { withFreeBeds, noFreeBeds } = eligibleShelters(shelters, person);
+
   return (
-    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {shelters
-        .filter((shelter) => shelter.closedAt === null)
-        .map((shelter) => (
+    <div className="flex flex-col gap-6">
+      <fieldset className="flex flex-wrap gap-x-6 gap-y-2 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <legend className="px-1 text-sm font-medium">The person</legend>
+        {personQuestions.map(({ fact, label }) => (
+          <label key={fact} className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              className="size-4"
+              checked={person[fact]}
+              onChange={(event) =>
+                setPerson({ ...person, [fact]: event.target.checked })
+              }
+            />
+            {label}
+          </label>
+        ))}
+      </fieldset>
+      {withFreeBeds.length === 0 && noFreeBeds.length === 0 && (
+        <p className="text-zinc-500">
+          No shelter can take someone with everything ticked.
+        </p>
+      )}
+      {withFreeBeds.length > 0 && (
+        <ShelterGroup title="Free beds" shelters={withFreeBeds} now={now} />
+      )}
+      {noFreeBeds.length > 0 && (
+        <ShelterGroup
+          title="No free beds"
+          shelters={noFreeBeds}
+          now={now}
+          greyedOut
+        />
+      )}
+    </div>
+  );
+}
+
+function ShelterGroup({
+  title,
+  shelters,
+  now,
+  greyedOut = false,
+}: {
+  title: string;
+  shelters: Shelter[];
+  now: Date;
+  greyedOut?: boolean;
+}) {
+  const headingId = `group-${title.toLowerCase().replaceAll(" ", "-")}`;
+  return (
+    <section aria-labelledby={headingId} className={greyedOut ? "opacity-60" : ""}>
+      <h2 id={headingId} className="mb-2 text-sm font-medium text-zinc-500">
+        {title}
+      </h2>
+      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {shelters.map((shelter) => (
           <li key={shelter.id}>
             <ShelterCard shelter={shelter} now={now} />
           </li>
         ))}
-    </ul>
+      </ul>
+    </section>
   );
 }
 
 function ShelterCard({ shelter, now }: { shelter: Shelter; now: Date }) {
   const headingId = `shelter-${shelter.id}`;
-  // Holds arrive in ticket 05.
-  const free = freeBeds({ ...shelter, activeHolds: 0 });
+  const free = freeBedsAt(shelter);
   const lastUpdated = lastUpdatedStatus(shelter.lastUpdatedAt, now);
   const rules = eligibilityRules(shelter);
 
@@ -32,9 +104,9 @@ function ShelterCard({ shelter, now }: { shelter: Shelter; now: Date }) {
       aria-labelledby={headingId}
       className="flex h-full flex-col gap-3 rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
     >
-      <h2 id={headingId} className="text-lg font-semibold">
+      <h3 id={headingId} className="text-lg font-semibold">
         {shelter.name}
-      </h2>
+      </h3>
       <p
         className={`text-2xl font-bold ${free > 0 ? "text-emerald-700 dark:text-emerald-400" : "text-zinc-500"}`}
       >

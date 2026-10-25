@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { Shelter } from "@/lib/shelters";
 import { ShelterBoard } from "./shelter-board";
@@ -6,6 +6,12 @@ import { ShelterBoard } from "./shelter-board";
 const now = new Date("2026-10-21T20:00:00-04:00");
 const minutesAgo = (minutes: number) =>
   new Date(now.getTime() - minutes * 60_000);
+
+const tick = (label: string) => fireEvent.click(screen.getByLabelText(label));
+const cardNames = (container: HTMLElement) =>
+  within(container)
+    .getAllByRole("article")
+    .map((card) => within(card).getByRole("heading").textContent);
 
 const shelter = (overrides: Partial<Shelter>): Shelter => ({
   id: "id",
@@ -42,6 +48,7 @@ describe("ShelterBoard", () => {
         ]}
       />,
     );
+    tick("Is a woman");
 
     const card = screen.getByRole("article", { name: "Harbor House" });
     expect(within(card).getByText("3 free beds")).toBeInTheDocument();
@@ -95,6 +102,7 @@ describe("ShelterBoard", () => {
         ]}
       />,
     );
+    tick("Can stay sober");
 
     const northside = screen.getByRole("article", { name: "Northside" });
     expect(within(northside).getByText("Accepts pets")).toBeInTheDocument();
@@ -123,5 +131,95 @@ describe("ShelterBoard", () => {
     const card = screen.getByRole("article", { name: "Maple Family Center" });
     expect(within(card).getByText("Accepts children")).toBeInTheDocument();
     expect(within(card).getByText("1 free family room")).toBeInTheDocument();
+  });
+
+  it("offers four unticked checkboxes about the person", () => {
+    render(<ShelterBoard now={now} shelters={[]} />);
+
+    for (const label of [
+      "Is a woman",
+      "Has children with them",
+      "Has a pet",
+      "Can stay sober",
+    ]) {
+      expect(screen.getByLabelText(label)).not.toBeChecked();
+    }
+  });
+
+  it("with nothing ticked, hides shelters that are women only or require sobriety", () => {
+    render(
+      <ShelterBoard
+        now={now}
+        shelters={[
+          shelter({ id: "women", name: "Harbor House", womenOnly: true }),
+          shelter({ id: "sober", name: "Clearwater", requiresSobriety: true }),
+          shelter({ id: "pets", name: "Northside", acceptsPets: true }),
+          shelter({ id: "none", name: "Downtown" }),
+        ]}
+      />,
+    );
+
+    expect(cardNames(document.body).sort()).toEqual(["Downtown", "Northside"]);
+  });
+
+  it("shows only shelters that accept pets once Has a pet is ticked", () => {
+    render(
+      <ShelterBoard
+        now={now}
+        shelters={[
+          shelter({ id: "pets", name: "Northside", acceptsPets: true }),
+          shelter({ id: "none", name: "Downtown" }),
+          shelter({ id: "family", name: "Maple Family Center", acceptsChildren: true }),
+        ]}
+      />,
+    );
+    tick("Has a pet");
+
+    expect(cardNames(document.body)).toEqual(["Northside"]);
+  });
+
+  it("lists shelters with free beds first, most first, and greys out full ones below with phone and last updated", () => {
+    render(
+      <ShelterBoard
+        now={now}
+        shelters={[
+          shelter({ id: "a", name: "Downtown", capacity: 60, occupied: 55 }),
+          shelter({
+            id: "b",
+            name: "Eastgate",
+            capacity: 30,
+            occupied: 30,
+            phone: "(617) 555-0107",
+            lastUpdatedAt: minutesAgo(10),
+          }),
+          shelter({ id: "c", name: "Harborview", capacity: 40, occupied: 32 }),
+        ]}
+      />,
+    );
+
+    const free = screen.getByRole("region", { name: "Free beds" });
+    expect(cardNames(free)).toEqual(["Harborview", "Downtown"]);
+    const full = screen.getByRole("region", { name: "No free beds" });
+    expect(cardNames(full)).toEqual(["Eastgate"]);
+    expect(within(full).getByText("(617) 555-0107")).toBeInTheDocument();
+    expect(within(full).getByText(/10 min ago/)).toBeInTheDocument();
+    expect(
+      free.compareDocumentPosition(full) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it("says so when no shelter would take the person", () => {
+    render(
+      <ShelterBoard
+        now={now}
+        shelters={[shelter({ id: "pets", name: "Northside", acceptsPets: true })]}
+      />,
+    );
+    tick("Has children with them");
+
+    expect(screen.queryAllByRole("article")).toEqual([]);
+    expect(
+      screen.getByText("No shelter can take someone with everything ticked."),
+    ).toBeInTheDocument();
   });
 });
