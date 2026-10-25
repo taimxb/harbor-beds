@@ -25,6 +25,11 @@ export function freeBeds({
   return Math.max(0, capacity - occupied - activeHolds);
 }
 
+export function freeBedsAt(shelter: Shelter): number {
+  // Holds arrive in ticket 05.
+  return freeBeds({ ...shelter, activeHolds: 0 });
+}
+
 // The family shelter (the one that accepts children) counts family rooms, not beds.
 export function freeCountText(
   free: number,

@@ -2,7 +2,7 @@
 
 import { startTransition, useState, useTransition } from "react";
 import {
-  freeBeds,
+  freeBedsAt,
   freeCountText,
   frontDeskName,
   lastUpdatedStatus,
@@ -20,8 +20,7 @@ export function FrontDeskScreen({
   checkIn: () => Promise<void>;
   checkOut: () => Promise<void>;
 }) {
-  // Holds arrive in ticket 05.
-  const free = freeBeds({ ...shelter, activeHolds: 0 });
+  const free = freeBedsAt(shelter);
   const lastUpdated = lastUpdatedStatus(shelter.lastUpdatedAt, now);
   const [failed, setFailed] = useState<string | null>(null);
   const [checkingOut, startCheckOut] = useTransition();
