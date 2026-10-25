@@ -30,6 +30,20 @@ export function freeBedsAt(shelter: Shelter): number {
   return freeBeds({ ...shelter, activeHolds: 0 });
 }
 
+// The family shelter (the one that accepts children) counts family rooms, not beds.
+export function freeCountText(
+  free: number,
+  shelter: Pick<Shelter, "acceptsChildren">,
+): string {
+  const unit = shelter.acceptsChildren ? "family room" : "bed";
+  return `${free} free ${unit}${free === 1 ? "" : "s"}`;
+}
+
+// Front desk actions are attributed to the shelter's desk, never to a person (ADR 0002).
+export function frontDeskName(shelter: Pick<Shelter, "name">): string {
+  return `${shelter.name} front desk`;
+}
+
 // Last updated turns amber after this long with no front desk action.
 const STALE_AFTER_MINUTES = 3 * 60;
 

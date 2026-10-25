@@ -6,7 +6,12 @@ import {
   nothingTicked,
   type PersonFacts,
 } from "@/lib/eligibility";
-import { freeBedsAt, lastUpdatedStatus, type Shelter } from "@/lib/shelters";
+import {
+  freeBedsAt,
+  freeCountText,
+  lastUpdatedStatus,
+  type Shelter,
+} from "@/lib/shelters";
 
 const personQuestions: { fact: keyof PersonFacts; label: string }[] = [
   { fact: "isWoman", label: "Is a woman" },
@@ -150,10 +155,4 @@ function eligibilityRules(shelter: Shelter): string[] {
     shelter.acceptsPets && "Accepts pets",
     shelter.requiresSobriety && "Requires sobriety",
   ].filter((rule): rule is string => rule !== false);
-}
-
-// The family shelter (the one that accepts children) counts family rooms, not beds.
-function freeCountText(free: number, shelter: Shelter): string {
-  const unit = shelter.acceptsChildren ? "family room" : "bed";
-  return `${free} free ${unit}${free === 1 ? "" : "s"}`;
 }
