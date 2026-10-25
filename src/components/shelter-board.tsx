@@ -1,7 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { eligibleShelters, type PersonFacts } from "@/lib/eligibility";
+import { useId, useState } from "react";
+import {
+  eligibleShelters,
+  nothingTicked,
+  type PersonFacts,
+} from "@/lib/eligibility";
 import { freeBedsAt, lastUpdatedStatus, type Shelter } from "@/lib/shelters";
 
 const personQuestions: { fact: keyof PersonFacts; label: string }[] = [
@@ -19,12 +23,7 @@ export function ShelterBoard({
   now: Date;
 }) {
   // Kept in memory only: what is ticked about a person is never saved.
-  const [person, setPerson] = useState<PersonFacts>({
-    isWoman: false,
-    hasChildren: false,
-    hasPet: false,
-    canStaySober: false,
-  });
+  const [person, setPerson] = useState<PersonFacts>(nothingTicked);
   const { withFreeBeds, noFreeBeds } = eligibleShelters(shelters, person);
 
   return (
@@ -47,7 +46,7 @@ export function ShelterBoard({
       </fieldset>
       {withFreeBeds.length === 0 && noFreeBeds.length === 0 && (
         <p className="text-zinc-500">
-          No shelter can take someone with everything ticked.
+          No shelter can take this person.
         </p>
       )}
       {withFreeBeds.length > 0 && (
@@ -76,7 +75,7 @@ function ShelterGroup({
   now: Date;
   greyedOut?: boolean;
 }) {
-  const headingId = `group-${title.toLowerCase().replaceAll(" ", "-")}`;
+  const headingId = useId();
   return (
     <section aria-labelledby={headingId} className={greyedOut ? "opacity-60" : ""}>
       <h2 id={headingId} className="mb-2 text-sm font-medium text-zinc-500">

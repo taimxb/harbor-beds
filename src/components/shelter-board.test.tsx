@@ -178,12 +178,27 @@ describe("ShelterBoard", () => {
     expect(cardNames(document.body)).toEqual(["Northside"]);
   });
 
-  it("lists shelters with free beds first, most first, and greys out full ones below with phone and last updated", () => {
+  it("lists shelters with free beds first, most free beds first", () => {
     render(
       <ShelterBoard
         now={now}
         shelters={[
           shelter({ id: "a", name: "Downtown", capacity: 60, occupied: 55 }),
+          shelter({ id: "b", name: "Eastgate", capacity: 30, occupied: 30 }),
+          shelter({ id: "c", name: "Harborview", capacity: 40, occupied: 32 }),
+        ]}
+      />,
+    );
+
+    const free = screen.getByRole("region", { name: "Free beds" });
+    expect(cardNames(free)).toEqual(["Harborview", "Downtown"]);
+  });
+
+  it("puts full shelters below, under No free beds, still showing phone and last updated", () => {
+    render(
+      <ShelterBoard
+        now={now}
+        shelters={[
           shelter({
             id: "b",
             name: "Eastgate",
@@ -192,20 +207,19 @@ describe("ShelterBoard", () => {
             phone: "(617) 555-0107",
             lastUpdatedAt: minutesAgo(10),
           }),
-          shelter({ id: "c", name: "Harborview", capacity: 40, occupied: 32 }),
+          shelter({ id: "a", name: "Downtown", capacity: 60, occupied: 55 }),
         ]}
       />,
     );
 
     const free = screen.getByRole("region", { name: "Free beds" });
-    expect(cardNames(free)).toEqual(["Harborview", "Downtown"]);
     const full = screen.getByRole("region", { name: "No free beds" });
     expect(cardNames(full)).toEqual(["Eastgate"]);
-    expect(within(full).getByText("(617) 555-0107")).toBeInTheDocument();
-    expect(within(full).getByText(/10 min ago/)).toBeInTheDocument();
     expect(
       free.compareDocumentPosition(full) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
+    expect(within(full).getByText("(617) 555-0107")).toBeInTheDocument();
+    expect(within(full).getByText(/10 min ago/)).toBeInTheDocument();
   });
 
   it("says so when no shelter would take the person", () => {
@@ -219,7 +233,7 @@ describe("ShelterBoard", () => {
 
     expect(screen.queryAllByRole("article")).toEqual([]);
     expect(
-      screen.getByText("No shelter can take someone with everything ticked."),
+      screen.getByText("No shelter can take this person."),
     ).toBeInTheDocument();
   });
 });

@@ -8,6 +8,13 @@ export type PersonFacts = {
   canStaySober: boolean;
 };
 
+export const nothingTicked: PersonFacts = {
+  isWoman: false,
+  hasChildren: false,
+  hasPet: false,
+  canStaySober: false,
+};
+
 // Open shelters that would take the person: those with free beds, most free
 // beds first, and those that are full. Ties keep the order they came in.
 export function eligibleShelters(

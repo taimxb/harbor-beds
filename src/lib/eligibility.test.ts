@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { eligibleShelters, type PersonFacts } from "./eligibility";
+import { eligibleShelters, nothingTicked } from "./eligibility";
 import type { Shelter } from "./shelters";
 
 const now = new Date("2026-10-21T20:00:00-04:00");
@@ -20,13 +20,6 @@ const shelter = (overrides: Partial<Shelter>): Shelter => ({
   ...overrides,
 });
 
-const nothingTicked: PersonFacts = {
-  isWoman: false,
-  hasChildren: false,
-  hasPet: false,
-  canStaySober: false,
-};
-
 const network = [
   shelter({ id: "downtown", name: "Downtown" }),
   shelter({ id: "harbor", name: "Harbor House", womenOnly: true }),
@@ -35,7 +28,8 @@ const network = [
   shelter({ id: "clearwater", name: "Clearwater", requiresSobriety: true }),
 ];
 
-const names = (shelters: Shelter[]) => shelters.map((s) => s.name).sort();
+const names = (shelters: Shelter[]) =>
+  shelters.map((shelter) => shelter.name).sort();
 
 describe("eligibleShelters", () => {
   it("with nothing ticked, keeps shelters that take anyone, including those accepting children or pets", () => {
@@ -109,12 +103,12 @@ describe("eligibleShelters", () => {
       ],
       nothingTicked,
     );
-    expect(withFreeBeds.map((s) => s.name)).toEqual([
+    expect(withFreeBeds.map((shelter) => shelter.name)).toEqual([
       "Harborview",
       "Downtown",
       "Northside",
     ]);
-    expect(noFreeBeds.map((s) => s.name)).toEqual(["Eastgate", "Westend"]);
+    expect(noFreeBeds.map((shelter) => shelter.name)).toEqual(["Eastgate", "Westend"]);
   });
 
   it("leaves out ineligible shelters even when they are full", () => {
